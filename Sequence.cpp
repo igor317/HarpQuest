@@ -1,40 +1,87 @@
 #include "Sequence.h"
 
-
+/**
+ * Конструктор Sequence
+ * Создает пустую последовательность
+ */
 Sequence::Sequence()
 {
-    
+    // Создает пустую последовательность с длиной 0
+    m_Length = 0;
 }
 
-void Sequence::AddValue(int value)
+/**
+ * Добавляет новое значение в конец последовательности
+ * 
+ * @param value значение для добавления (обычно 1-5, номер струны)
+ * @return true если значение успешно добавлено, false если последовательность полная
+ */
+bool Sequence::AddValue(byte value)
 {
-    m_Buffer[m_Length] = value;
-    m_Length++;
+    // Проверяем, что последовательность не достигла максимальной длины
+    if (m_Length < MAX_SEQUENCE_LENGTH)
+    {
+        // Добавляем значение в конец последовательности
+        m_Values[m_Length++] = value;
+        return true;
+    }
+    return false;
 }
 
-int Sequence::GetValue(int index)
+/**
+ * Возвращает значение по указанному индексу
+ * 
+ * @param index индекс элемента (начиная с 0)
+ * @return значение элемента на указанной позиции или 0, если индекс вне диапазона
+ */
+byte Sequence::GetValue(byte index)
 {
-    if (index < 0 || index >= m_Length)
-        return -1;
-
-    return m_Buffer[index];
+    // Проверяем, что индекс находится в допустимом диапазоне
+    if (index < m_Length)
+        return m_Values[index];
+    return 0;
 }
 
+/**
+ * Возвращает текущую длину последовательности
+ * 
+ * @return количество элементов в последовательности
+ */
+byte Sequence::Length()
+{
+    return m_Length;
+}
+
+/**
+ * Очищает последовательность (устанавливает длину в 0)
+ * Значения в массиве остаются, но они недоступны из-за нулевой длины
+ */
 void Sequence::Clear()
 {
     m_Length = 0;
 }
 
-int Sequence::Length()
+/**
+ * Сравнивает текущую последовательность с другой
+ * Последовательности считаются равными, если они имеют одинаковую длину
+ * и все соответствующие элементы совпадают
+ * 
+ * @param sequence последовательность для сравнения
+ * @return true если последовательности совпадают, false в противном случае
+ */
+bool Sequence::Compare(Sequence& sequence)
 {
-    return m_Length;
-}
+    // Проверяем, что длины последовательностей совпадают
+    if (m_Length != sequence.Length())
+        return false;
 
-bool Sequence::Compare(Sequence& other)
-{   
-    for (int i = 0;i<m_Length;++i)
-        if (m_Buffer[i] != other.GetValue(i))
+    // Сравниваем каждый элемент последовательностей
+    for (byte i = 0; i < m_Length; ++i)
+    {
+        if (m_Values[i] != sequence.GetValue(i))
             return false;
-
+    }
+    
+    // Если все элементы совпадают, последовательности равны
     return true;
 }
