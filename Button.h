@@ -1,3 +1,12 @@
+/**
+ * Button.h - Класс для работы с кнопкой
+ * 
+ * Этот класс обеспечивает управление кнопкой, подключенной к Arduino,
+ * с поддержкой функций обратного вызова при нажатии и удержании.
+ * Класс также обрабатывает дребезг контактов и позволяет
+ * настраивать уровень срабатывания.
+ */
+
 #ifndef BUTTON_H
 #define BUTTON_H
 
@@ -5,32 +14,83 @@
 #include "Vector.h"
 #include "Arduino.h"
 
+// Задержка для устранения дребезга контактов кнопки (в миллисекундах)
 #define BUTTON_BOUNCE_DELAY 50
 
+/**
+ * Структура для хранения функции обратного вызова и
+ * времени удержания кнопки, после которого она будет вызвана
+ */
 struct TimeoutCallback
 {
+	// Вектор функций обратного вызова
 	Vector<EventFunc*> function;
-    unsigned long timeout;
+	
+	// Время в миллисекундах, после которого будут вызваны функции
+	unsigned long timeout;
 };
 
+/**
+ * Класс для работы с кнопкой
+ * Обеспечивает обработку нажатий с учетом дребезга контактов
+ * и вызывает соответствующие функции обратного вызова
+ */
 class Button
 {
 public:
-    int m_Pin;
+	// Пин, к которому подключена кнопка
+	int m_Pin;
 
-    Vector<TimeoutCallback*> m_TimeoutCallback;
-    unsigned long m_Timer;
-    unsigned long m_Delta;
-    bool m_Pressed = false;
-    bool m_TriggeredLevel = true;
+	// Вектор функций обратного вызова с различными таймаутами
+	Vector<TimeoutCallback*> m_TimeoutCallback;
+	
+	// Время начала нажатия кнопки (для определения длительности нажатия)
+	unsigned long m_Timer;
+	
+	// Разница между текущим временем и временем начала нажатия
+	unsigned long m_Delta;
+	
+	// Флаг, показывающий, нажата ли кнопка в данный момент
+	bool m_Pressed = false;
+	
+	// Уровень сигнала, при котором кнопка считается нажатой (true - HIGH, false - LOW)
+	bool m_TriggeredLevel = true;
 public:
-    Button(int pin);
-    ~Button();
-    void Run();
+	/**
+	 * Конструктор Button
+	 * 
+	 * @param pin номер пина, к которому подключена кнопка
+	 */
+	Button(int pin);
+	
+	/**
+	 * Деструктор Button
+	 * Освобождает ресурсы, занятые кнопкой
+	 */
+	~Button();
+	
+	/**
+	 * Основной метод обработки кнопки
+	 * Должен вызываться в цикле loop()
+	 * Обрабатывает нажатия и вызывает соответствующие функции
+	 */
+	void Run();
 
-    void SetTriggeredLevel(bool level);
+	/**
+	 * Устанавливает уровень сигнала, при котором кнопка считается нажатой
+	 * 
+	 * @param level уровень срабатывания (true - HIGH, false - LOW)
+	 */
+	void SetTriggeredLevel(bool level);
 
-    void AddClickCallback(EventFunc* callback, unsigned long timeout = 0);
+	/**
+	 * Добавляет функцию обратного вызова, которая будет вызвана при нажатии кнопки
+	 * 
+	 * @param callback указатель на функцию, которая будет вызвана
+	 * @param timeout время в миллисекундах, после которого будет вызвана функция
+	 *                (0 - вызов при обычном нажатии, >0 - вызов при удержании)
+	 */
+	void AddClickCallback(EventFunc* callback, unsigned long timeout = 0);
 };
 
 #endif
